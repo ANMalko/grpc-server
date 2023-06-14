@@ -1,0 +1,50 @@
+syntax = "proto3";
+package users;
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+option go_package = "github.com/ANMalko/grpc-server.git/proto/users";
+// option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {};
+
+
+message User {
+    uint32 id = 1;
+    string name = 2;
+    string email = 3;
+    string phoneNumber = 4;
+}
+
+message UserId {
+    uint32 id = 1;
+}
+
+message UserCreate {
+    string name = 1;
+    string email = 2;
+    string phoneNumber = 3;
+}
+
+service UserService {
+  rpc GetUser (UserId) returns (User) {
+    option (google.api.http) = {
+      get: "/user/{id}"
+    };
+  }
+  rpc CreateUser (UserCreate) returns (User) {
+    option (google.api.http) = {
+      post: "/user"
+      body: "*"
+    };
+  }
+  rpc UpdateUser (User) returns (User) {
+    option (google.api.http) = {
+      post: "/user/{id}"
+      body: "*"
+    };
+  }
+  rpc DeleteUser (google.protobuf.Empty) returns (User) {
+    option (google.api.http) = {
+      delete: "/user"
+    };
+  }
+}
