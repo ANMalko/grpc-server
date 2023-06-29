@@ -9,14 +9,10 @@ import (
 
 const configFile = "config.yml"
 
-// type APIConfig struct {
-// 	prefix string
-
-// }
-
 type Config struct {
 	HTTPPort int `yaml:"http_port"`
 	GRPCPort int `yaml:"grpc_port"`
+	UserDbFilename string `yaml:"user_db_filename"`
 }
 
 func GetAPIConfig() *Config {

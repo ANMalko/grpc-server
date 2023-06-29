@@ -5,68 +5,90 @@ import (
 	"fmt"
 
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	usersproto "github.com/ANMalko/grpc-server.git/proto/users"
+	"github.com/ANMalko/grpc-server.git/db/model"
+	"github.com/ANMalko/grpc-server.git/db/error"
 )
 
+type UsersDAO interface {
+	GetUser(ctx context.Context, userID uint32) *model.User
+	CreateUser(ctx context.Context, user *model.User) (*model.User, error)
+	DeleteUser(ctx context.Context, userID uint32)
+	UpdateUser(ctx context.Context, user *model.User) error
+}
+
 type Server struct {
+	dao UsersDAO
 	usersproto.UnimplementedUserServiceServer
 }
 
-func NewServer() *Server {
-	return &Server{}
+func NewServer(dao UsersDAO) *Server {
+	return &Server{dao: dao}
 }
 
 func (s *Server) GetUser(ctx context.Context, req *usersproto.UserId) (*usersproto.User, error) {
-	fmt.Println("GetUser")
-	fmt.Printf("%v", req)
+	user := s.dao.GetUser(ctx, req.Id)
+
+	if user == nil {
+		return nil, status.Error(codes.NotFound, fmt.Sprint(dberror.ENOTFOUND))
+	}
 
 	response := usersproto.User{
-		Id: req.Id,
-		Name: "User Name",
-		Email: "user_name@mail.ru",
-		PhoneNumber: "+7-952-201-86-24",
+		Id: user.Id,
+		Name: user.Name,
+		Email: user.Email,
+		PhoneNumber: user.PhoneNumber,
     }
 
 	return &response, nil
 }
 
-func (s *Server) CreateUser(ctx context.Context, req *usersproto.UserCreate) (*usersproto.User, error) {
-	fmt.Println("CreateUser")
-	fmt.Printf("%v", req)
-
-	response := usersproto.User{
-		Id: 123,
-		Name: req.Name,
-		Email: req.Email,
-		PhoneNumber: req.PhoneNumber,
-    }
-
-	return &response, nil
-}
-
-func (s *Server) UpdateUser(ctx context.Context, req *usersproto.User) (*usersproto.User, error) {
-	fmt.Println("UpdateUser")
-	fmt.Printf("%v", req)
-
-	response := usersproto.User{
+func (s *Server) CreateUser(ctx context.Context, req *usersproto.User) (*usersproto.User, error) {
+	user := model.User{
 		Id: req.Id,
 		Name: req.Name,
 		Email: req.Email,
 		PhoneNumber: req.PhoneNumber,
+	}
+
+
+	new_user, err := s.dao.CreateUser(ctx, &user,)
+
+	if err != nil && err.Error() == fmt.Sprint(dberror.EALREADYEXISTS) {
+		return nil, status.Error(codes.AlreadyExists, fmt.Sprint(dberror.EALREADYEXISTS))
+	}
+
+	response := usersproto.User{
+		Id: new_user.Id,
+		Name: new_user.Name,
+		Email: new_user.Email,
+		PhoneNumber: new_user.PhoneNumber,
     }
 
 	return &response, nil
 }
 
-func (s *Server) DeleteUser(ctx context.Context, _ *emptypb.Empty) (*usersproto.User, error) {
-	fmt.Println("DeleteUser")
-	response := usersproto.User{
-		Id: 333,
-		Name: "Deleted user name",
-		Email: "Deleted user email",
-		PhoneNumber: "Deleted user phone",
-    }
+func (s *Server) UpdateUser(ctx context.Context, req *usersproto.User) (*emptypb.Empty, error) {
+	user := model.User{
+		Id: req.Id,
+		Name: req.Name,
+		Email: req.Email,
+		PhoneNumber: req.PhoneNumber,
+	}
 
-	return &response, nil
+	err := s.dao.UpdateUser(ctx, &user)
+
+	if err != nil && err.Error() == fmt.Sprint(dberror.ENOTFOUND) {
+		return nil, status.Error(codes.AlreadyExists, fmt.Sprint(dberror.ENOTFOUND))
+	}
+
+	return nil, nil
+}
+
+func (s *Server) DeleteUser(ctx context.Context, req *usersproto.UserId) (*emptypb.Empty, error) {
+	s.dao.DeleteUser(ctx, req.Id)
+	return nil, nil
 }
