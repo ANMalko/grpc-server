@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	// "sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/rs/zerolog/log"

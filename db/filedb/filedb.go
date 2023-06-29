@@ -20,25 +20,20 @@ type FileDB struct {
 func NewFileDB(ctx context.Context, fileName string) *FileDB{
 	dB := make(map[uint32]*model.User, 10)
 	fileDB := FileDB{fileName, dB}
-
 	fileDB.loadDB()
-
 	return &fileDB
-
 }
 
 func (f *FileDB) AddUser(user *model.User) bool {
 	if _, ok := f.dB[user.Id]; ok {
 		return false
 	}
-
 	f.dB[user.Id] = user
 	return true
 }
 
 func (f *FileDB) GetUser(userId uint32) *model.User {
 	var user *model.User
-
 	user, ok := f.dB[userId]
 	if !ok {
 		return nil
@@ -55,9 +50,7 @@ func (f *FileDB) UpdateUser(user *model.User) bool {
 	if !ok {
 		return false
 	}
-
 	f.dB[user.Id] = user
-
 	return true
 }
 

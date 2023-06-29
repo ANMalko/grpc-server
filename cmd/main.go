@@ -65,9 +65,7 @@ func main() {
 		case <-sigterm:
 			log.Info().Msg("terminating: via signal")
 		}
-		fmt.Println("-------1-------")
 		usersDAO.DB().DumpDB()
-		fmt.Println("-------2-------")
 		cancel()
 	}()
 

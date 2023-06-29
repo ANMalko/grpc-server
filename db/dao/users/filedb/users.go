@@ -1,7 +1,6 @@
 package usersdao
 
 import (
-	// "fmt"
 	"context"
 
 	"github.com/ANMalko/grpc-server.git/db/model"
