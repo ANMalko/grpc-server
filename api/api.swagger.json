@@ -16,58 +16,6 @@
     "application/json"
   ],
   "paths": {
-    "/user": {
-      "delete": {
-        "operationId": "UserService_DeleteUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/usersUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "UserService"
-        ]
-      },
-      "post": {
-        "operationId": "UserService_CreateUser",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/usersUser"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/usersUserCreate"
-            }
-          }
-        ],
-        "tags": [
-          "UserService"
-        ]
-      }
-    },
     "/user/{id}": {
       "get": {
         "operationId": "UserService_GetUser",
@@ -98,13 +46,92 @@
           "UserService"
         ]
       },
+      "delete": {
+        "operationId": "UserService_DeleteUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
       "post": {
-        "operationId": "UserService_UpdateUser",
+        "operationId": "UserService_CreateUser",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
               "$ref": "#/definitions/usersUser"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "email": {
+                  "type": "string"
+                },
+                "phoneNumber": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "patch": {
+        "operationId": "UserService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
             }
           },
           "default": {
@@ -184,20 +211,6 @@
           "type": "integer",
           "format": "int64"
         },
-        "name": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
-        "phoneNumber": {
-          "type": "string"
-        }
-      }
-    },
-    "usersUserCreate": {
-      "type": "object",
-      "properties": {
         "name": {
           "type": "string"
         },
